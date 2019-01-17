@@ -46,5 +46,6 @@ void close()
 {
 	SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow( window );
+	IMG_Quit();
 	SDL_Quit();
 }
