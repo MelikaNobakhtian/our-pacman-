@@ -1,24 +1,3 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include<SDL2/SDL2_gfxPrimitives.h>
-#include<SDL2/SDL2_rotozoom.h>
-#include <string>
-#include<cmath>
-#include<vector>
-#include<cstdlib>
-#include<ctime>
-#include<SDL2/SDL_ttf.h>
-using namespace std;
-
-const int SCREEN_WIDTH = 481;
-const int SCREEN_HEIGHT = 720;
-SDL_Surface* Surface=NULL;
-SDL_Window* window=NULL;
-SDL_Renderer* rend=NULL;
-bool quit=false;
-SDL_Event event;
-
 class ghost
 {
 public:
@@ -91,14 +70,41 @@ ghost Clyde;
 
 class pacman
 {
- 
+ public:
+  	int x1;
+        int x2;
+        int y1;
+        int y2;
 	float vx;
 	float vy;
-	SDL_Texture* pacman[8];
+	SDL_Rect pac[8];
+        SDL_Texture pacman;
+        SDL_Rect dead[11];
+        SDL_Texture deadpac;
 
 void initpacman( std::string path ){
-	
+	SDL_Surface* pacsurf= IMG_Load( path.c_str() );
+      	pacman=SDL_CreateTextureFromSurface( rend, pacsurf);
+		for(int i=0; i<8;i++){
+			pac[i].x=i*20;
+			pac[i].y=0;
+			pac[i].w=20;
+			pac[i].h=20;
+		}
+	SDL_FreeSurface( pacsurf );
 }
+	
+void initdead( std::string path ){
+	 SDL_Surface* pacsurf= IMG_Load( path.c_str() );
+      	deadpac=SDL_CreateTextureFromSurface( rend, pacsurf);
+		for(int i=0; i<11;i++){
+			dead[i].x=i*20;
+			dead[i].y=0;
+			dead[i].w=20;
+			dead[i].h=20;
+		}
+	SDL_FreeSurface( pacsurf );
+}	
 
 void show
 
@@ -115,6 +121,7 @@ void show
 
 
 };
+pacman Player;
 
 class fruit
 {
@@ -123,81 +130,23 @@ class fruit
 	int x2;
 	int y1;
 	int y2;
-	SDL_Texture fruit[7];
+	SDL_Rect fruit[7];
+	SDL_Texture food;
 
 	void initfruit( std::string path ){
-
+		SDL_Surface* fruitsurf= IMG_Load( path.c_str() );
+      	food=SDL_CreateTextureFromSurface( rend, fruitsurf);
+		for(int i=0; i<11;i++){
+			fruit[i].x=i*20;
+			fruit[i].y=0;
+			fruit[i].w=20;
+			fruit[i].h=20;
+		}
+          SDL_FreeSurface( fruitsurf );
 	}
 
 	
 	
 };
 
-void init(){
-	
-	SDL_Init(SDL_INIT_EVERYTHING);
-	IMG_Init(IMG_INIT_PNG);
-	TTF_Init();
-	
-	window= SDL_CreateWindow("Pac-Man", SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-	if(!window){
-		printf("error creating window: %s\n", SDL_GetError());
-		SDL_Quit();
-	}
-	
-	rend= SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (!rend)
- 	{
-    	 printf("error creating renderer: %s\n", IMG_GetError());
-     	getchar();
-     	SDL_DestroyWindow(window);
-     	SDL_Quit();
-	 }
-	 
-}
 
-//SDL_Texture* loadTexture( std::string path )
-//{
-//    SDL_Texture* newTexture = NULL;
-//    SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-//    SDL_Texture* newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-//    SDL_FreeSurface( loadedSurface );
-//    return newTexture;
-//}
-
-void close()
-{
-	
-	SDL_DestroyRenderer(rend);
-	SDL_DestroyWindow( window );
-	IMG_Quit();
-	SDL_Quit();
-}
-
-int main( int argc, char* args[] )
-{
-	srand(time(0));
-	init();
-	Blinky.initghost("Blinky.png");
-	Pinky.initghost("Pinky.png");
-	Inky.initghost("Inky.png");
-	Clyde.initghost("Clyde.png");
-	Blinky.blueinit("Blue Ghosts.png");
-	Inky.blueinit("Blue Ghosts.png");
-	Pinky.blueinit("Blue Ghosts.png");
-	Clyde.blueinit("Blue Ghosts.png");
-	Blinky.initeyes("A pair of Eyes.png");
-	Inky.initeyes("A pair of Eyes.png");
-	Pinky.initeyes("A pair of Eyes.png");
-	Clyde.initeyes("A pair of Eyes.png");
-	while(!quit){
-		while(SDL_PollEvent(&event)!=0){
-			if( event.type == SDL_QUIT )
-			{
-				quit = true;
-				return;
-			}
-		}
-	}
-	close();
-}
