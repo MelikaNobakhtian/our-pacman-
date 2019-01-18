@@ -96,9 +96,9 @@ class pacman
     int x2;
     int y1;
     int y2;
-	float vx;
-	float vy;
-	SDL_Rect pac[8];
+    float vx;
+    float vy;
+    SDL_Rect pac[8];
     SDL_Texture pacman;
     SDL_Rect dead[11];
     SDL_Texture deadpac;
@@ -107,10 +107,10 @@ void initpacman( std::string path ){
 	 SDL_Surface* pacsurf= IMG_Load( path.c_str() );
       	pacman=SDL_CreateTextureFromSurface( rend, pacsurf);
 		for(int i=0; i<8;i++){
-			png[i].x=i*20;
-			png[i].y=0;
-			png[i].w=20;
-			png[i].h=20;
+			pac[i].x=i*20;
+			pac[i].y=0;
+			pac[i].w=20;
+			pac[i].h=20;
 		}
 	SDL_FreeSurface( pacsurf );
 }
@@ -119,10 +119,10 @@ void initdead( std::string path ){
 	 SDL_Surface* pacsurf= IMG_Load( path.c_str() );
       	deadpac=SDL_CreateTextureFromSurface( rend, pacsurf);
 		for(int i=0; i<11;i++){
-			png[i].x=i*20;
-			png[i].y=0;
-			png[i].w=20;
-			png[i].h=20;
+			dead[i].x=i*20;
+			dead[i].y=0;
+			dead[i].w=20;
+			dead[i].h=20;
 		}
 	SDL_FreeSurface( pacsurf );
 }
@@ -158,12 +158,12 @@ class fruit
 		SDL_Surface* fruitsurf= IMG_Load( path.c_str() );
       	food=SDL_CreateTextureFromSurface( rend, fruitsurf);
 		for(int i=0; i<11;i++){
-			png[i].x=i*20;
-			png[i].y=0;
-			png[i].w=20;
-			png[i].h=20;
+			fruit[i].x=i*20;
+			fruit[i].y=0;
+			fruit[i].w=20;
+			fruit[i].h=20;
 		}
-      SDL_FreeSurface( fruitsurf)
+      SDL_FreeSurface( fruitsurf);
 	}
 
 	
