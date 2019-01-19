@@ -11,13 +11,14 @@
 #include<SDL2/SDL_ttf.h>
 using namespace std;
 
-const int SCREEN_WIDTH = 481;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 800;
 SDL_Surface* Surface=NULL;
 SDL_Window* window=NULL;
 SDL_Renderer* rend=NULL;
 bool quit=false;
 SDL_Event event;
+int i;
 int Blocks[55][4]={{20,68,620,78},{20,68,30,282},{20,272,138,282},{128,272,138,356},{20,346,138,356},
 {20,400,138,410},{128,400,138,484},{20,474,138,484},{20,484,30,732},{20,722,620,732},
 {610,474,620,732},{502,474,620,484},{502,400,512,484},{502,400,620,410},{502,346,620,356},
@@ -40,19 +41,21 @@ public:
       float vx;
       float vy;
       SDL_Rect png[8];
-      SDL_Texture ghost;
+      SDL_Texture* ghost;
       SDL_Rect blue[4];
-      SDL_Texture blueghost;
+      SDL_Texture* blueghost;
       SDL_Rect eyes[4];
-      SDL_Texture ghosteyes;
+      SDL_Rect ghostpos={x1,y1,x2-x1,y2-y1};
+      SDL_Texture* ghosteyes;
+      int direction;
       void initghost ( std::string path ){
       	SDL_Surface* ghostsurf= IMG_Load( path.c_str() );
       	ghost=SDL_CreateTextureFromSurface( rend, ghostsurf);
 		for(int i=0; i<8;i++){
-			png[i].x=i*20;
+			png[i].x=i*44;
 			png[i].y=0;
-			png[i].w=20;
-			png[i].h=20;
+			png[i].w=44;
+			png[i].h=44;
 		}
 		SDL_FreeSurface( ghostsurf );
       }
@@ -62,10 +65,10 @@ public:
       	SDL_Surface* ghostsurf= IMG_Load( path.c_str() );
       	blueghost=SDL_CreateTextureFromSurface( rend, ghostsurf);
 		for(int i=0; i<4;i++){
-			blue[i].x=i*20;
+			blue[i].x=i*44;
 			blue[i].y=0;
-			blue[i].w=20;
-			blue[i].h=20;
+			blue[i].w=44;
+			blue[i].h=44;
 		}
 		SDL_FreeSurface( ghostsurf );
 	  }
@@ -74,18 +77,24 @@ public:
       {
       	SDL_Surface* ghostsurf= IMG_Load( path.c_str() );
       	ghosteyes=SDL_CreateTextureFromSurface( rend, ghostsurf);
-		for(int i=0; i<4;i++){
-			eyes[i].x=i*20;
+		for(i=0; i<4;i++){
+			eyes[i].x=i*44;
 			eyes[i].y=0;
-			eyes[i].w=20;
-			eyes[i].h=20;
+			eyes[i].w=44;
+			eyes[i].h=44;
 		}
 		SDL_FreeSurface( ghostsurf );
 	  }
 	  
-      void show()
+      void show(int x1, int y1)
 	  {
-
+	  	if(direction%2){
+	  		direction--;
+	  	}else{
+	  		direction++;
+	  	}
+	  	ghostpos.x=x1; ghostpos.y=y1; ghostpos.w=44; ghostpos.h=44;
+	  	SDL_RenderCopy(rend,ghost,&png[direction],&ghostpos);
       }
 
      
@@ -109,20 +118,22 @@ class pacman
     int y2;
     float vx;
     float vy;
-    SDL_Rect pac[8];
-    SDL_Texture pacman;
+    SDL_Rect pac[9];
+    SDL_Texture* pacman;
     SDL_Rect dead[11];
-    SDL_Texture deadpac;
+    SDL_Texture* deadpac;
+    SDL_Rect Pacmanpos={x1,y1,x2-x1,y2-y1};
 
 void initpacman( std::string path ){
 	 SDL_Surface* pacsurf= IMG_Load( path.c_str() );
       	pacman=SDL_CreateTextureFromSurface( rend, pacsurf);
-		for(int i=0; i<8;i++){
-			pac[i].x=i*20;
-			pac[i].y=0;
-			pac[i].w=20;
-			pac[i].h=20;
+		for(i=0; i<8;i++){
+			pac[i].x=(i%2)*44;
+			pac[i].y=(i/2)*44;
+			pac[i].w=44;
+			pac[i].h=44;
 		}
+	pac[9].x=88; pac[9].y=0; pac[9].w=44; pac[9].h=44;
 	SDL_FreeSurface( pacsurf );
 }
 
@@ -130,25 +141,25 @@ void initdead( std::string path ){
 	 SDL_Surface* pacsurf= IMG_Load( path.c_str() );
       	deadpac=SDL_CreateTextureFromSurface( rend, pacsurf);
 		for(int i=0; i<11;i++){
-			dead[i].x=i*20;
+			dead[i].x=i*44;
 			dead[i].y=0;
-			dead[i].w=20;
-			dead[i].h=20;
+			dead[i].w=44;
+			dead[i].h=44;
 		}
 	SDL_FreeSurface( pacsurf );
 }
 
-void show
+void show();
 
  void move(int x1,int x2,int y1,int y2,float vx,float vy){
-      if(){
-        y1+=vy;
-        y2+=vy;
-      }
-      if(){
+      //if(){
+        //y1+=vy;
+        //y2+=vy;
+      //}
+      /*if(){
       	x1+=vx;
       	x2+=vy;
-      }
+      }*/
       }
 
 
@@ -162,18 +173,17 @@ class fruit
 	int x2;
 	int y1;
 	int y2;
-	SDL_Rect fruit[7];
-	SDL_Texture food;
+	SDL_Rect fruit;
+	SDL_Texture* food;
+	SDL_Rect fruitpos={x1,y1,x2-x1,y2-y1};
 
 	void initfruit( std::string path ){
 		SDL_Surface* fruitsurf= IMG_Load( path.c_str() );
       	food=SDL_CreateTextureFromSurface( rend, fruitsurf);
-		for(int i=0; i<11;i++){
-			fruit[i].x=i*20;
-			fruit[i].y=0;
-			fruit[i].w=20;
-			fruit[i].h=20;
-		}
+		fruit.x=0;
+		fruit.y=0;
+		fruit.w=44;
+		fruit.h=44;
       SDL_FreeSurface( fruitsurf);
 	}
 
@@ -186,7 +196,7 @@ void init(){
 	
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_PNG);
-	TTF_Init();
+	//TTF_Init();
 	
 	window= SDL_CreateWindow("Pac-Man", SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 	if(!window){
@@ -216,7 +226,21 @@ void init(){
 
 void close()
 {
-	
+	SDL_DestroyTexture(Blinky.ghosteyes);
+	SDL_DestroyTexture(Blinky.ghost);
+	SDL_DestroyTexture(Blinky.blueghost);
+	SDL_DestroyTexture(Inky.ghosteyes);
+	SDL_DestroyTexture(Inky.ghost);
+	SDL_DestroyTexture(Inky.blueghost);
+	SDL_DestroyTexture(Pinky.ghosteyes);
+	SDL_DestroyTexture(Pinky.ghost);
+	SDL_DestroyTexture(Pinky.blueghost);
+	SDL_DestroyTexture(Clyde.ghosteyes);
+	SDL_DestroyTexture(Clyde.ghost);
+	SDL_DestroyTexture(Clyde.blueghost);
+	SDL_DestroyTexture(Player.pacman);
+	SDL_DestroyTexture(Player.deadpac);
+	SDL_DestroyTexture(Foody.food);
 	SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow( window );
 	IMG_Quit();
@@ -239,17 +263,36 @@ int main( int argc, char* args[] )
 	Inky.initeyes("A pair of Eyes.png");
 	Pinky.initeyes("A pair of Eyes.png");
 	Clyde.initeyes("A pair of Eyes.png");
-	Player.initpacman("");
-	Player.initdead("");
-	Foody.initfruit("");
+	Player.initpacman("Pacman");
+	//Player.initdead("");
+	Foody.initfruit("Cherry");
+	Pinky.direction=1;
+	Blinky.direction=3;
+	Inky.direction=5;
+	Clyde.direction=6;
 	while(!quit){
 		while(SDL_PollEvent(&event)!=0){
 			if( event.type == SDL_QUIT )
 			{
 				quit = true;
-				return;
+				return 0;
 			}
 		}
+		SDL_Delay(200);
+		SDL_SetRenderDrawColor( rend, 0, 0, 0, 0xFF );
+		SDL_RenderClear( rend );
+		for(int i=0;i<54;i++){
+					boxRGBA(rend,Blocks[i][0],Blocks[i][1],Blocks[i][2],Blocks[i][3],0,0,255,255);
+				}
+		boxRGBA(rend,Blocks[54][0],Blocks[54][1],Blocks[54][2],Blocks[54][3],255,255,255,255);
+		Pinky.show(254,356);
+		Inky.show(298,356);
+		Blinky.show(298,292);
+		Clyde.show(342,356);
+		//SDL_RenderCopy(rend,Pinky.ghost,&Pinky.png[Pinky.direction],&Pinky.ghostpos);
+		SDL_RenderPresent( rend );
 	}
+
 	close();
+	return 0;
 }
