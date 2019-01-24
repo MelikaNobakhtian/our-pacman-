@@ -128,7 +128,8 @@ public:
 			y1=y;
 			x1+=vx;
       		y1-=vy;
-      		ghostCollision();
+      		if(x<615 && x>25)
+      			ghostCollision();
       		if(direction%2){
       			direction--;
 			  }else{
@@ -140,6 +141,7 @@ public:
 			if(time>450) {
 				turnedblue=false;
 				time=0;
+				count=0;
 			}
 			else if(time<400){
 				SDL_RenderCopy(rend,blueghost,&blue[direction%2],&ghostpos);
@@ -151,51 +153,46 @@ public:
 			}	
 		}
 		else if(turnedtoeyes){
-			/*if(x==298 && y==292){
-				vy=2;
-				backtocenter=true;
-				turnedtoeyes=false;
-			}else{
-				if(horizontal){
-					if(x==298 && y!=292) horizontal=false;
-					if(x<298 && vx<0 && y!= 292) vx*=-1;
-				
-					else if(x>298 && vx>0 && y!= 292) vx*=-1;
-				}else if(vx==0) horizontal=true;
-				if(vertical){
-					if(y==292 && x!=298) vertical=false;
-					else if(y<292 && vy>0 && x!=298) vy*=-1;
-
-					else if(y>292 && vy<0 && x!=298) vy*=-1;
-				}else if (vy==0) vertical=true;
-			}*/
 			x1=x;
 			y1=y;
       		x1+=vx;
 	      	y1-=vy;
-    	  	ghosteyeCollision();
+    	  		ghosteyeCollision();
 			ghostpos.x=x1; ghostpos.y=y1;
 			if(ghostpos.x>640) x1=-44;
 			else if(ghostpos.x<-44) x1=640;
 			SDL_RenderCopy(rend,ghosteyes,&eyes[direction/2],&ghostpos);
 		}
 		else if(backtocenter){
-			if(y>354){
+			time++;
+			if(y<354){
 				vx=0;
-				vy=2;
+				vy=-2;
+				changepng();
 			}else if(y==354){
 				y+=2;
 				vy=0;
 				vx=2;
+				changepng();
 			}
-			if(x==256) vx*=-1;
-			else if(x==384) vx*=-1;
+			if(x==256) {
+				vx*=-1;
+				changepng();
+			}
+			else if(x==384) {
+				vx*=-1;
+				changepng();
+			}
 			x1=x;
 			y1=y;
-			ghostCollision();
 			x1+=vx;
 			y1-=vy;
 			ghostpos.x=x1; ghostpos.y=y1;
+			if(time>100){
+				backtocenter=false;
+				includewhiterect=false;
+				time=0;
+			}
 			SDL_RenderCopy(rend,ghosteyes,&eyes[direction/2],&ghostpos);
 			
 		}else if(!includewhiterect){
@@ -242,7 +239,8 @@ public:
 			y1=y;
 	  		x1+=vx;
 	  		y1-=vy;
-	  		ghostCollision();
+	  		if(x<615 && x>25)
+	  			ghostCollision();
 	  		if(direction%2){
 	  			direction--;
 	  		}else{
@@ -782,11 +780,13 @@ dots[291][0]=351;dots[291][1]=675;
 }
 
 void showDots(){
+	int eaten=0;
 	for(i=0;i<224;i+=2 ){
 		if(!turnedtouch[i]){
 			if(i==202 || i==220 || i==156 || i==12) continue;
 				boxRGBA(rend,dots[i][0],dots[i][1],dots[i][0]+5,dots[i][1]+5,249, 218, 197,255);
 			}
+			else eaten++;
 		}	
 
 		for(i=1;i<293;i+=2 ){
@@ -794,15 +794,22 @@ void showDots(){
 				if(i==223 || i==239 || i==65 || i==181) continue;
 				boxRGBA(rend,dots[i][0],dots[i][1],dots[i][0]+4,dots[i][1]+4,249, 218, 197,255);
 			}
+			else eaten++;
 		}
 		if(!turnedtouch[12])
-		filledCircleRGBA(rend,dots[12][0]+3,dots[12][1]+3,11,249, 218, 197,255);
+			filledCircleRGBA(rend,dots[12][0]+3,dots[12][1]+3,11,249, 218, 197,255);
+		else eaten++;
 		if(!turnedtouch[156])
-		filledCircleRGBA(rend,dots[156][0]+3,dots[156][1]+3,11,249, 218, 197,255);
+			filledCircleRGBA(rend,dots[156][0]+3,dots[156][1]+3,11,249, 218, 197,255);
+		else eaten++;
 		if(!turnedtouch[65])
-		filledCircleRGBA(rend,dots[65][0]+2,dots[65][1]+2,11,249, 218, 197,255);
+			filledCircleRGBA(rend,dots[65][0]+2,dots[65][1]+2,11,249, 218, 197,255);
+		else eaten++;
 		if(!turnedtouch[181])
-		filledCircleRGBA(rend,dots[181][0]+2,dots[181][1]+2,11,249, 218, 197,255);
+			filledCircleRGBA(rend,dots[181][0]+2,dots[181][1]+2,11,249, 218, 197,255);
+		else eaten++;
+
+	if(eaten==254) quit=true;
 }
 
 void dotpacmanCollision(){
@@ -839,14 +846,22 @@ void dotpacmanCollision(){
 		dotpos.y=dots[12][1]-8;
 		if(SDL_HasIntersection(&dotpos,&pacmannn)){
 			turnedtouch[12]=true;
-			if(!Clyde.turnedtoeyes)
+			if(!Clyde.turnedtoeyes && !Clyde.backtocenter){
+				Clyde.time=0;
 				Clyde.turnedblue=true;
-			if(!Blinky.turnedtoeyes)
+			}
+			if(!Blinky.turnedtoeyes && !Blinky.backtocenter){
+				Blinky.time=0;
 				Blinky.turnedblue=true;
-			if(!Inky.turnedtoeyes)
+			}
+			if(!Inky.turnedtoeyes && !Inky.backtocenter){
+				Inky.time=0;
 				Inky.turnedblue=true;
-			if(!Pinky.turnedtoeyes)
+			}
+			if(!Pinky.turnedtoeyes && !Pinky.backtocenter){
+				Pinky.time=0;
 				Pinky.turnedblue=true;
+			}
 		}
 	}
 	if(!turnedtouch[156]){
@@ -854,14 +869,22 @@ void dotpacmanCollision(){
 		dotpos.y=dots[156][1]-8;
 		if(SDL_HasIntersection(&dotpos,&pacmannn)){
 			turnedtouch[156]=true;
-			if(!Clyde.turnedtoeyes)
+			if(!Clyde.turnedtoeyes && !Clyde.backtocenter){
+				Clyde.time=0;
 				Clyde.turnedblue=true;
-			if(!Blinky.turnedtoeyes)
+			}
+			if(!Blinky.turnedtoeyes && !Blinky.backtocenter){
+				Blinky.time=0;
 				Blinky.turnedblue=true;
-			if(!Inky.turnedtoeyes)
+			}
+			if(!Inky.turnedtoeyes && !Inky.backtocenter){
+				Inky.time=0;
 				Inky.turnedblue=true;
-			if(!Pinky.turnedtoeyes)
+			}
+			if(!Pinky.turnedtoeyes && !Pinky.backtocenter){
+				Pinky.time=0;
 				Pinky.turnedblue=true;
+			}
 		}
 	}
 	if(!turnedtouch[65]){
@@ -869,14 +892,22 @@ void dotpacmanCollision(){
 		dotpos.y=dots[65][1]-9;
 		if(SDL_HasIntersection(&dotpos,&pacmannn)){
 			turnedtouch[65]=true;
-			if(!Clyde.turnedtoeyes)
+			if(!Clyde.turnedtoeyes && !Clyde.backtocenter){
+				Clyde.time=0;
 				Clyde.turnedblue=true;
-			if(!Blinky.turnedtoeyes)
+			}
+			if(!Blinky.turnedtoeyes && !Blinky.backtocenter){
+				Blinky.time=0;
 				Blinky.turnedblue=true;
-			if(!Inky.turnedtoeyes)
+			}
+			if(!Inky.turnedtoeyes && !Inky.backtocenter){
+				Inky.time=0;
 				Inky.turnedblue=true;
-			if(!Pinky.turnedtoeyes)
+			}
+			if(!Pinky.turnedtoeyes && !Pinky.backtocenter){
+				Pinky.time=0;
 				Pinky.turnedblue=true;
+			}
 		}
 	}
 	if(!turnedtouch[181]){
@@ -884,14 +915,22 @@ void dotpacmanCollision(){
 		dotpos.y=dots[181][1]-9;
 		if(SDL_HasIntersection(&dotpos,&pacmannn)){
 			turnedtouch[181]=true;
-			if(!Clyde.turnedtoeyes)
+			if(!Clyde.turnedtoeyes && !Clyde.backtocenter){
+				Clyde.time=0;
 				Clyde.turnedblue=true;
-			if(!Blinky.turnedtoeyes)
+			}
+			if(!Blinky.turnedtoeyes && !Blinky.backtocenter){
+				Blinky.time=0;
 				Blinky.turnedblue=true;
-			if(!Inky.turnedtoeyes)
+			}
+			if(!Inky.turnedtoeyes && !Inky.backtocenter){
+				Inky.time=0;
 				Inky.turnedblue=true;
-			if(!Pinky.turnedtoeyes)
+			}
+			if(!Pinky.turnedtoeyes && !Pinky.backtocenter){
+				Pinky.time=0;
 				Pinky.turnedblue=true;
+			}
 		}
 	}
 }
@@ -983,6 +1022,13 @@ void StartMenu(){
     SDL_Rect readyrect={258,433,130,20};
     SDL_FreeSurface( readysurf);
 	while(ready){
+		while(SDL_PollEvent(&event)!=0){
+			if( event.type == SDL_QUIT )
+			{
+				quit = true;
+				return ;
+			}
+		}
 		readytime++;
 		SDL_Delay(50);
 		SDL_SetRenderDrawColor( rend, 0, 0, 0, 0xFF );
@@ -1000,7 +1046,7 @@ void StartMenu(){
 		SDL_RenderCopy(rend,Pinky.ghost,&Pinky.png[Pinky.direction],&Pinky.ghostpos);
 		SDL_RenderCopy(rend,readytex,NULL,&readyrect);
 		SDL_RenderPresent( rend );
-		if(readytime>200) ready=false;
+		if(readytime>50) ready=false;
 	}
 }
 
