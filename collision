@@ -1,0 +1,76 @@
+Collision
+
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<8;j++ ){
+		if( SDL_HasIntersection( &Pinky.png[i],&pac[j] ){
+		Player.showdead();
+		}
+	}
+}
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<8;j++ ){
+		if( SDL_HasIntersection( &Blinky.png[i] , &pac[j] ){
+		Player.showdead();
+		}
+	}
+}
+
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<8;j++ ){
+		if( SDL_HasIntersection( &Inky.png[i] , &pac[j] ){
+		Player.showdead();
+		}
+	}
+}
+
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<8;j++ ){
+		if( SDL_HasIntersection( &Clyde.png[i] , &pac[j] ){
+		Player.showdead();
+		}
+	}
+}
+
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<4;j++ ){
+		if( SDL_HasIntersection( &Blinky.blue[i] , &pac[j] ){
+		count++;
+		score=count*200;
+		ghost.showeyes();
+		break;
+		}
+	}
+}
+
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<4;j++ ){
+		if( SDL_HasIntersection( &Pinky.blue[i] , &pac[j] ){
+		count++;
+		score=count*200;
+		ghost.showeyes();
+		break;
+		}
+	}
+}
+
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<4;j++ ){
+		if( SDL_HasIntersection( &Inky.blue[i] , &pac[j] ){
+		count++;
+		score=count*200;
+		ghost.showeyes();
+		break;
+		}
+	}
+}
+
+for( int i=0;i<8;i++ ){
+	for( int j=0;j<4;j++ ){
+		if( SDL_HasIntersection( &Clyde.blue[i] , &pac[j] ){
+		count++;
+		score=count*200;
+		ghost.showeyes();
+		break;
+		}
+	}
+}
